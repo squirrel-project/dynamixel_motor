@@ -48,6 +48,7 @@ import rospy
 from dynamixel_driver.dynamixel_const import *
 
 from dynamixel_controllers.srv import SetPosition
+from dynamixel_controllers.srv import SetRelativePosition
 from dynamixel_controllers.srv import SetSpeed
 from dynamixel_controllers.srv import SetSpeedandPosition
 from dynamixel_controllers.srv import TorqueEnable
@@ -77,6 +78,7 @@ class JointController:
         
         self.speed_service = rospy.Service(self.controller_namespace + '/set_speed', SetSpeed, self.process_set_speed)
         self.position_service = rospy.Service(self.controller_namespace + '/set_position', SetPosition, self.process_set_position)
+        self.relative_position_service = rospy.Service(self.controller_namespace + '/set_relative_position', SetRelativePosition, self.process_set_relative_position)
         self.speed_position_service = rospy.Service(self.controller_namespace + '/set_speed_and_position', SetSpeedandPosition, self.process_set_speed_and_position)
         self.torque_service = rospy.Service(self.controller_namespace + '/torque_enable', TorqueEnable, self.process_torque_enable)
         self.compliance_slope_service = rospy.Service(self.controller_namespace + '/set_compliance_slope', SetComplianceSlope, self.process_set_compliance_slope)
@@ -132,6 +134,9 @@ class JointController:
     def set_position(self, position):
         raise NotImplementedError
 
+    def set_relative_position(self, position):
+        raise NotImplementedError
+
     def set_compliance_slope(self, slope):
         raise NotImplementedError
 
@@ -154,6 +159,9 @@ class JointController:
 
     def process_set_position(self, req):
         return self.set_position(req.position)
+
+    def process_set_relative_position(self, req):
+        return self.set_relative_position(req.position)
 
     def process_torque_enable(self, req):
         self.set_torque_enable(req.torque_enable)

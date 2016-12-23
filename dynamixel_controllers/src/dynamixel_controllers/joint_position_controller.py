@@ -137,6 +137,8 @@ class JointPositionController(JointController):
         min_max_limit_reached = False
         angle = position
         limit = 0.1
+        # for now we set the speed really high
+        self.set_speed(5.0)
         mcv = (self.motor_id, self.pos_rad_to_raw(angle))
         self.dxl_io.set_multi_position([mcv])
 
@@ -144,14 +146,19 @@ class JointPositionController(JointController):
         rospy.sleep(0.1)
 
         while self.joint_state.is_moving:
-            rospy.sleep(0.1)
+            rospy.sleep(0.01)
 
         if abs(self.joint_state.current_pos - position) < limit:
             goal_reached = True
+            return (goal_reached, min_max_limit_reached)
         if abs(self.max_angle - self.joint_state.goal_pos) < limit or \
                         abs(self.min_angle - self.joint_state.goal_pos) < limit:
             min_max_limit_reached = True
-        return (goal_reached, min_max_limit_reached)
+            return (goal_reached, min_max_limit_reached)
+
+    def set_relative_position(self, position):
+        goal = self.joint_state.current_pos + position
+        return self.set_position(goal)
 
     def set_compliance_slope(self, slope):
         if slope < DXL_MIN_COMPLIANCE_SLOPE: slope = DXL_MIN_COMPLIANCE_SLOPE
