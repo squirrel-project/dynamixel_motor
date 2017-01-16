@@ -73,9 +73,9 @@ class JointController:
         self.compliance_margin = rospy.get_param(self.controller_namespace + '/joint_compliance_margin', None)
         self.compliance_punch = rospy.get_param(self.controller_namespace + '/joint_compliance_punch', None)
         self.torque_limit = rospy.get_param(self.controller_namespace + '/joint_torque_limit', None)
-        
+
         self.__ensure_limits()
-        
+
         self.speed_service = rospy.Service(self.controller_namespace + '/set_speed', SetSpeed, self.process_set_speed)
         self.position_service = rospy.Service(self.controller_namespace + '/set_position', SetPosition, self.process_set_position)
         self.relative_position_service = rospy.Service(self.controller_namespace + '/set_relative_position', SetRelativePosition, self.process_set_relative_position)
@@ -91,17 +91,17 @@ class JointController:
             if self.compliance_slope < DXL_MIN_COMPLIANCE_SLOPE: self.compliance_slope = DXL_MIN_COMPLIANCE_SLOPE
             elif self.compliance_slope > DXL_MAX_COMPLIANCE_SLOPE: self.compliance_slope = DXL_MAX_COMPLIANCE_SLOPE
             else: self.compliance_slope = int(self.compliance_slope)
-            
+
         if self.compliance_margin is not None:
             if self.compliance_margin < DXL_MIN_COMPLIANCE_MARGIN: self.compliance_margin = DXL_MIN_COMPLIANCE_MARGIN
             elif self.compliance_margin > DXL_MAX_COMPLIANCE_MARGIN: self.compliance_margin = DXL_MAX_COMPLIANCE_MARGIN
             else: self.compliance_margin = int(self.compliance_margin)
-            
+
         if self.compliance_punch is not None:
             if self.compliance_punch < DXL_MIN_PUNCH: self.compliance_punch = DXL_MIN_PUNCH
             elif self.compliance_punch > DXL_MAX_PUNCH: self.compliance_punch = DXL_MAX_PUNCH
             else: self.compliance_punch = int(self.compliance_punch)
-            
+
         if self.torque_limit is not None:
             if self.torque_limit < 0: self.torque_limit = 0.0
             elif self.torque_limit > 1: self.torque_limit = 1.0
@@ -113,6 +113,7 @@ class JointController:
         self.running = True
         self.joint_state_pub = rospy.Publisher(self.controller_namespace + '/state', JointState, queue_size=1)
         self.command_sub = rospy.Subscriber(self.controller_namespace + '/command', Float64, self.process_command)
+        self.relative_command_sub = rospy.Subscriber(self.controller_namespace + '/relative_command', Float64, self.process_relative_command)
         self.motor_states_sub = rospy.Subscriber('motor_states/%s' % self.port_namespace, MotorStateList, self.process_motor_states)
 
     def stop(self):
@@ -189,6 +190,9 @@ class JointController:
     def process_command(self, msg):
         raise NotImplementedError
 
+    def process_relative_command(self, msg):
+        raise NotImplementedError
+
     def rad_to_raw(self, angle, initial_position_raw, flipped, encoder_ticks_per_radian):
         """ angle is in radians """
         #print 'flipped = %s, angle_in = %f, init_raw = %d' % (str(flipped), angle, initial_position_raw)
@@ -198,4 +202,3 @@ class JointController:
 
     def raw_to_rad(self, raw, initial_position_raw, flipped, radians_per_encoder_tick):
         return (initial_position_raw - raw if flipped else raw - initial_position_raw) * radians_per_encoder_tick
-
