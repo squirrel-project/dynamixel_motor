@@ -212,8 +212,8 @@ class JointPositionController(JointController):
         angle = msg.data
         mcv = (self.motor_id, self.pos_rad_to_raw(angle))
         self.dxl_io.set_multi_position([mcv])
-goal
+
     def process_relative_command(self, msg):
         angle = self.joint_state.current_pos + msg.data
         mcv = (self.motor_id, self.pos_rad_to_raw(angle))
-        self.dcl_io.set_multi_position([mcv])
+        self.dxl_io.set_multi_position([mcv])
