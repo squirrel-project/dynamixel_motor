@@ -10,6 +10,7 @@ add_service_files(
   SetCompliancePunch.srv
   SetComplianceSlope.srv
   SetPosition.srv
+  SetRelativePosition.srv
   SetSpeed.srv
   SetSpeedandPosition.srv
   SetTorqueLimit.srv
