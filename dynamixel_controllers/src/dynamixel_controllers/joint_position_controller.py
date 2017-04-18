@@ -157,6 +157,7 @@ class JointPositionController(JointController):
             return (goal_reached, min_max_limit_reached)
 
     def set_relative_position(self, position):
+        rospy.loginfo("service got called with {} as data".format(position))
         goal = self.joint_state.current_pos + position
         return self.set_position(goal)
 
